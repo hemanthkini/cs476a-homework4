@@ -1,9 +1,18 @@
 #pragma once
 
 #include "ofMain.h"
+#include "delayCircle.h"
+
+#define MAX_CIRCLES 5
 
 class ofApp : public ofBaseApp{
-
+    private:
+        int num_circles;
+        vector<delayCircle *> circleVector;
+        int rolling_ptr;
+        queue<int> delay_id_queue;
+        int selected_index;
+    
 	public:
 		void setup();
 		void update();
