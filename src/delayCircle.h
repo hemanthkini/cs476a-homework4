@@ -26,14 +26,18 @@ public:
         this->x = x;
         this->y = y;
         this->index = index;
-        radius = 10;
-        red = ((int)ofRandom(40.0)) % 40;
-        green = ((int)ofRandom(40.0)) % 40;
-        blue = ((int)ofRandom(40.0)) % 40;
-        // TODO make everything not blue
-        color = ((red & 0xFF) << 4)  | ((green & 0xFF) << 2) | ((blue & 0xFF));
+        radius = 20;
+        red = ((int)ofRandom(256.0)) % 256;
+        green = ((int)ofRandom(256.0)) % 256;
+        blue = ((int)ofRandom(256.0)) % 256;
+        color = ((red & 0xFF) << 16)  | ((green & 0xFF) << 8) | ((blue & 0xFF));
+        this->setRadius();
     }
-    
+
+    void setRadius() {
+        this->radius = (int)(20.0 + 40.0 * (1.0 - ((float)y) / ofGetHeight()));
+        
+    }
     
     int getX () {
         return this->x;
@@ -75,6 +79,7 @@ public:
     void setXYandUpdate(int x, int y) {
         this->setX(x);
         this->setY(y);
+        this->setRadius();
     }
     
     // Draw the circle
