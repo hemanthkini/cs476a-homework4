@@ -24,12 +24,15 @@ void ofApp::setup(){
     nInputChans         = 2;
     volume				= 0.5f;
     
+    // TODO remove if we use STK delays
+    /*
     lAudio.assign(bufferSize, 0.0);
     rAudio.assign(bufferSize, 0.0);
     audioBuffer = new float*[2];
     audioBuffer[0] = &lAudio[0];
     audioBuffer[1] = &rAudio[0];
-    
+    */
+     
     soundStream.printDeviceList();
     
     soundStream.setup(this, 2, 0, sampleRate, bufferSize, 4);
@@ -39,6 +42,7 @@ void ofApp::setup(){
     // TODO implement sound playing 
     
     ofSetFrameRate(60);
+    stk::Stk::setSampleRate(44100.0);
 }
 
 //--------------------------------------------------------------
@@ -62,11 +66,22 @@ void ofApp::draw(){
 void ofApp::keyPressed(int key){
     
     if (key == 'd') {
-        if (num_circles > 0) {
-            delay_id_queue.push(circleVector[0]->getIndex());
-            circleVector.erase(circleVector.begin());
-            num_circles = num_circles - 1;
+        if (num_circles == 0) {
+            return;
         }
+        
+        for (int i = num_circles - 1; i >= 0; i--) {
+            if (circleVector[i]->within(ofGetMouseX(),ofGetMouseY())) {
+                delay_id_queue.push(circleVector[i]->getIndex());
+                circleVector.erase(circleVector.begin() + i);
+                num_circles = num_circles - 1;
+                return;
+            }
+        }
+        
+        delay_id_queue.push(circleVector[0]->getIndex());
+        circleVector.erase(circleVector.begin());
+        num_circles = num_circles - 1;
     }
 }
 
@@ -129,6 +144,7 @@ void ofApp::mousePressed(int x, int y, int button){
 
 void ofApp::dragEvent(ofDragInfo dragInfo) {
     // TODO load and start playing soundfile here.
+    
 }
 
 //--------------------------------------------------------------

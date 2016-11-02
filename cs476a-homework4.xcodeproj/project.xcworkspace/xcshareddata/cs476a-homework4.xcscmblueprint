@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "DDADBAFFA07651A104FA279AE003C6080F7511A2",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "E5DA4D92130C7B723FB350437C3985BBF83F9A93" : 9223372036854775807,
+    "DDADBAFFA07651A104FA279AE003C6080F7511A2" : 9223372036854775807
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "7101F61A-B339-4239-8F14-2F7041BB71EC",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "E5DA4D92130C7B723FB350437C3985BBF83F9A93" : "..\/..\/addons\/ofxStk",
+    "DDADBAFFA07651A104FA279AE003C6080F7511A2" : "cs476a-homework4\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "cs476a-homework4",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "cs476a-homework4.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "github.com:hemanthkini\/cs476a-homework4.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "DDADBAFFA07651A104FA279AE003C6080F7511A2"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/Ahbee\/ofxStk.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "E5DA4D92130C7B723FB350437C3985BBF83F9A93"
+    }
+  ]
+}

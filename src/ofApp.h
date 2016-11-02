@@ -2,6 +2,7 @@
 
 #include "ofMain.h"
 #include "delayCircle.h"
+#include "ofxStk.h"
 
 #define MAX_CIRCLES 5
 
@@ -20,10 +21,14 @@ class ofApp : public ofBaseApp{
         float volume;
     
         ofSoundStream soundStream;
+
+    // TODO remove if we use STK
+    /*
         vector <float> lAudio;
         vector <float> rAudio;
     
         float **audioBuffer; // The 2d audio buffer that Faust wants to work with
+     */
     
 	public:
 		void setup();
