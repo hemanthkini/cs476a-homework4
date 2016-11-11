@@ -4,7 +4,10 @@
 #include "delayCircle.h"
 #include "ofxStk.h"
 
-#define MAX_CIRCLES 5
+#define MAX_CIRCLES 15
+
+#define WINDOW_WIDTH 1024
+#define WINDOW_HEIGHT 768
 
 class ofApp : public ofBaseApp{
     private:
@@ -21,13 +24,16 @@ class ofApp : public ofBaseApp{
         int bufferSize;
         float volume;
         int fileNumChannels;
+        bool fileLoaded;
+
+        stk::Echo delays[MAX_CIRCLES * 2];
+        float delay_levels[MAX_CIRCLES];
+        float delay_lengths[MAX_CIRCLES];
     
         ofSoundStream soundStream;
     
         stk::FileWvIn fileInput;
     
-        bool fileLoaded;
-
     // TODO remove if we use STK
     /*
         vector <float> lAudio;

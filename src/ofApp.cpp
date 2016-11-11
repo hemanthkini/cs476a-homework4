@@ -9,6 +9,12 @@ void ofApp::setup(){
     rolling_ptr = 0;
     for (int i = 0; i < MAX_CIRCLES; i++) {
         delay_id_queue.push(i);
+        delays[i].clear();
+        delays[i+1].clear();
+        delays[i].setMaximumDelay(44100);
+        delays[i+1].setMaximumDelay(44100);
+        delay_levels[i] = 0.0;
+        delay_lengths[i] = 0.5;
     }
 
     ofLog(OF_LOG_NOTICE, "INITIALIZING...");
@@ -44,7 +50,7 @@ void ofApp::setup(){
     // TODO implement sound playing 
     
     ofSetFrameRate(60);
-    stk::Stk::setSampleRate(44100.0);
+    stk::Stk::setSampleRate((float)sampleRate);
     
     
 }
@@ -78,14 +84,18 @@ void ofApp::keyPressed(int key){
         // Attempt to delete the circle that our mouse is over
         for (int i = num_circles - 1; i >= 0; i--) {
             if (circleVector[i]->within(ofGetMouseX(),ofGetMouseY())) {
-                delay_id_queue.push(circleVector[i]->getIndex());
+                int delayIndex = circleVector[i]->getIndex();
+                delay_levels[delayIndex] = 0.0;
+                delay_id_queue.push(delayIndex);
                 circleVector.erase(circleVector.begin() + i);
                 num_circles = num_circles - 1;
                 return;
             }
         }
         
-        // Otherwise, delete the first circle we made
+        // Otherwise, delete the least-recent circle we modified
+        int delayIndex = circleVector[0]->getIndex();
+        delay_levels[delayIndex] = 0.0;
         delay_id_queue.push(circleVector[0]->getIndex());
         circleVector.erase(circleVector.begin());
         num_circles = num_circles - 1;
@@ -95,7 +105,6 @@ void ofApp::keyPressed(int key){
     if (key == 'c') {
         fileInput.closeFile();
         fileLoaded = false;
-    
     }
     
     // Pause the song.
@@ -118,6 +127,9 @@ void ofApp::mouseMoved(int x, int y ){
 //--------------------------------------------------------------
 void ofApp::mouseDragged(int x, int y, int button){
     circleVector[selected_index]->setXYandUpdate(x + selected_x,y + selected_y);
+    int delayIndex = circleVector[selected_index]->getIndex();
+    delay_levels[delayIndex] = circleVector[selected_index]->getEchoMix();
+    delay_lengths[delayIndex] = circleVector[selected_index]->getEchoDelay();
 }
 
 //--------------------------------------------------------------
@@ -140,7 +152,7 @@ void ofApp::mousePressed(int x, int y, int button){
 
     // if we've not maxed out the number of delayCircles, draw one
     if (num_circles < MAX_CIRCLES) {
-        circleVector.push_back(new delayCircle(x, y, delay_id_queue.front()));
+        circleVector.push_back(new delayCircle(x, y, delay_id_queue.front(), WINDOW_WIDTH, WINDOW_HEIGHT, sampleRate));
         selected_index = num_circles;
         num_circles = num_circles+1;
         selected_x = 0;
@@ -152,14 +164,16 @@ void ofApp::mousePressed(int x, int y, int button){
     {
         delay_id_queue.push(circleVector[0]->getIndex());
         circleVector.erase(circleVector.begin());
-        circleVector.push_back(new delayCircle(x,y, delay_id_queue.front()));
+        circleVector.push_back(new delayCircle(x,y, delay_id_queue.front(), WINDOW_WIDTH, WINDOW_HEIGHT, sampleRate));
         delay_id_queue.pop();
         selected_index = num_circles - 1;
         selected_x = 0;
         selected_y = 0;
     }
     
-    
+    int delayIndex = circleVector[selected_index]->getIndex();
+    delay_levels[delayIndex] = circleVector[selected_index]->getEchoMix();
+    delay_lengths[delayIndex] = circleVector[selected_index]->getEchoDelay();
 }
 
 void ofApp::dragEvent(ofDragInfo dragInfo) {
@@ -189,7 +203,12 @@ void ofApp::mouseReleased(int x, int y, int button){
     circleVector.push_back(circleVector[selected_index]);
     circleVector.erase(circleVector.begin() + selected_index);
     
-    // TODO Implement deletion here.
+    // Update all delays.
+    for (int i = 0; i < MAX_CIRCLES; i++) {
+        delays[i*2].setDelay((int)(delay_lengths[i] * sampleRate));
+        delays[(2*i)+1].setDelay((int)(delay_lengths[i] * sampleRate));
+    }
+    ofLog(OF_LOG_NOTICE, "%d", (int)(delay_lengths[0] * sampleRate));
     
 }
 
@@ -221,8 +240,17 @@ void ofApp::audioOut( float * output, int bufferSize, int nChannels ) {
             output[i] = fileInput.tick(0) * volume; // writing to the left channel
             if (fileNumChannels == 2)
                 output[i+1] = fileInput.tick(1) * volume; // writing to the right channel
-            else
-                output[i+1] = output[i];
+
+            for (int j = 0; j < MAX_CIRCLES; j++) {
+                output[i] = (output[i] * (1.0 - delay_levels[j])) + (delays[j * 2].tick(output[i]) * delay_levels[j]);
+                if (fileNumChannels == 2) {
+                    output[i+1] = (output[i+1] * (1.0 - delay_levels[j])) + (delays[j * 2 +1].tick(output[i+1]) * delay_levels[j]);
+                }
+                else {
+                    output[i+1] = output[i];
+                }
+            }
+            
         }
     }
 }
