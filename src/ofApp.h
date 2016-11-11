@@ -18,9 +18,15 @@ class ofApp : public ofBaseApp{
     
         // audio stuff
         int	sampleRate, nInputChans;
+        int bufferSize;
         float volume;
+        int fileNumChannels;
     
         ofSoundStream soundStream;
+    
+        stk::FileWvIn fileInput;
+    
+        bool fileLoaded;
 
     // TODO remove if we use STK
     /*

@@ -11,6 +11,8 @@ void ofApp::setup(){
         delay_id_queue.push(i);
     }
 
+    ofLog(OF_LOG_NOTICE, "INITIALIZING...");
+    
     // initialize audio
     
     // 2 output channels,
@@ -19,7 +21,7 @@ void ofApp::setup(){
     // 512 samples per buffer
     // 4 num buffers (latency)
     
-    int bufferSize		= 512;
+    bufferSize		= 256;
     sampleRate 			= 44100;
     nInputChans         = 2;
     volume				= 0.5f;
@@ -43,6 +45,8 @@ void ofApp::setup(){
     
     ofSetFrameRate(60);
     stk::Stk::setSampleRate(44100.0);
+    
+    
 }
 
 //--------------------------------------------------------------
@@ -65,11 +69,13 @@ void ofApp::draw(){
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
     
+    // Delete a circle
     if (key == 'd') {
         if (num_circles == 0) {
             return;
         }
         
+        // Attempt to delete the circle that our mouse is over
         for (int i = num_circles - 1; i >= 0; i--) {
             if (circleVector[i]->within(ofGetMouseX(),ofGetMouseY())) {
                 delay_id_queue.push(circleVector[i]->getIndex());
@@ -79,9 +85,23 @@ void ofApp::keyPressed(int key){
             }
         }
         
+        // Otherwise, delete the first circle we made
         delay_id_queue.push(circleVector[0]->getIndex());
         circleVector.erase(circleVector.begin());
         num_circles = num_circles - 1;
+    }
+    
+    // Close the currently playing song.
+    if (key == 'c') {
+        fileInput.closeFile();
+        fileLoaded = false;
+    
+    }
+    
+    // Pause the song.
+    if (key == 'p') {
+        if (fileInput.isOpen())
+            fileLoaded = !fileLoaded;
     }
 }
 
@@ -144,7 +164,23 @@ void ofApp::mousePressed(int x, int y, int button){
 
 void ofApp::dragEvent(ofDragInfo dragInfo) {
     // TODO load and start playing soundfile here.
+    string filePath = dragInfo.files[0];
+    ofLog(OF_LOG_NOTICE, "String filepath =  %s", filePath.c_str());
+    // TODO force that it's .wav
+    //if (filePath.endswith)
     
+    // Query for number of channels in file (1 or 2)
+    stk::FileRead fr;
+    fr.open(filePath);
+    fileNumChannels = fr.channels();
+    fr.close();
+    
+    // Load file and signal playback
+    fileInput.openFile(filePath);
+    fileLoaded = true;
+    float nFrames = fileInput.getSize();
+    ofLog(OF_LOG_NOTICE, "File size in frames: %f\tnumChannels: %d", nFrames, fileNumChannels);
+
 }
 
 //--------------------------------------------------------------
@@ -179,8 +215,14 @@ void ofApp::gotMessage(ofMessage msg){
 
 void ofApp::audioOut( float * output, int bufferSize, int nChannels ) {
     // TODO get audio playing
-    for(int i = 0; i < bufferSize * nChannels; i += 2) {
-        output[i] = 0.0 * volume; // writing to the left channel
-        output[i+1] = 0.0 * volume; // writing to the right channel
+    if (fileLoaded) {
+        //ofLog(OF_LOG_NOTICE, "PLAYING");
+        for(int i = 0; i < bufferSize * nChannels; i += 2) {
+            output[i] = fileInput.tick(0) * volume; // writing to the left channel
+            if (fileNumChannels == 2)
+                output[i+1] = fileInput.tick(1) * volume; // writing to the right channel
+            else
+                output[i+1] = output[i];
+        }
     }
 }
