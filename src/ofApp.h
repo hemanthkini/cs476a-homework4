@@ -4,10 +4,11 @@
 #include "delayCircle.h"
 #include "ofxStk.h"
 
-#define MAX_CIRCLES 15
+#define MAX_CIRCLES 10
 
 #define WINDOW_WIDTH 1024
 #define WINDOW_HEIGHT 768
+#define MY_PIE           3.14159265358979 // for convenience
 
 class ofApp : public ofBaseApp{
     private:
@@ -25,22 +26,25 @@ class ofApp : public ofBaseApp{
         float volume;
         int fileNumChannels;
         bool fileLoaded;
+        string filePath;
 
         stk::Echo delays[MAX_CIRCLES * 2];
         float delay_levels[MAX_CIRCLES];
         float delay_lengths[MAX_CIRCLES];
     
+        // Angle for the starting draw point of the circle. 
+        float angle;
+    
         ofSoundStream soundStream;
     
         stk::FileWvIn fileInput;
     
-    // TODO remove if we use STK
-    /*
-        vector <float> lAudio;
-        vector <float> rAudio;
+        // Vectors for our waveform
+        vector<float> audio;
+        vector<float> bufferedAudio;
     
-        float **audioBuffer; // The 2d audio buffer that Faust wants to work with
-     */
+        // Double vectors to save previous waveforms, for plotting
+        vector< vector<float> > audioHistory;
     
 	public:
 		void setup();

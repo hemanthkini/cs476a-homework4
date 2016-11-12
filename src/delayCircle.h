@@ -14,40 +14,46 @@
 
 class delayCircle : public ofBaseApp{
 private:
-    int x;
-    int y;
-    int radius;
+    float x;
+    float y;
+    float radius;
     int index;
     int Enabled;
     int red;
     int green;
     int blue;
-    int color;
+    int alpha;
+    ofColor* color;
+    int brightness;
     float echoMix;
     float echoDelay;
     int Window_Width;
     int Window_Height;
     int Sample_Rate;
     
+    
 public:
     delayCircle (int x, int y, int index, int Window_Width, int Window_Height, int Sample_Rate) {
-        this->x = x;
-        this->y = y;
+        this->x = (float)x;
+        this->y = (float)y;
         this->index = index;
         this->Window_Width = Window_Width;
         this->Window_Height = Window_Height;
         radius = 20;
         red = ((int)ofRandom(256.0)) % 256;
-        green = ((int)ofRandom(256.0)) % 256;
-        blue = ((int)ofRandom(256.0)) % 256;
-        color = ((red & 0xFF) << 16)  | ((green & 0xFF) << 8) | ((blue & 0xFF));
+        green = (green + (int)ofRandom(74.0) + 17) % 256;
+        blue = (red + ((int)ofRandom(174.0)) + 41) % 256;
         this->setRadius();
         setXYandUpdate(x, y);
+        alpha = 128;
+        brightness = ((int)ofRandom(128.0) + 127);
+        color = new ofColor(red, green, blue, alpha);
+        color->setBrightness(brightness);
         
     }
     
     void setEchoMix() {
-        echoMix = 0.7 * (((float)Window_Height - (float)y) / (float)Window_Height);
+        echoMix = 0.4 * (((float)Window_Height - (float)y) / (float)Window_Height);
     }
     
     void setEchoDelay() {
@@ -62,8 +68,12 @@ public:
         return echoDelay;
     }
 
+    int getBrightness() {
+        return this->brightness;
+    }
+    
     void setRadius() {
-        this->radius = (int)(20.0 + 40.0 * (1.0 - ((float)y) / ofGetHeight()));
+        this->radius = (15.0 + 30.0 * (1.0 - ((float)y) / ofGetHeight()));
     }
     
     int getX () {
@@ -78,9 +88,22 @@ public:
         return this->radius;
     }
     
-    int getColor() {
-        return this->color;
+    int getRed() {
+        return this->red;
     }
+    
+    int getBlue() {
+        return this->blue;
+    }
+    
+    int getGreen() {
+        return this->green;
+    }
+    
+    int getAlpha() {
+        return this->alpha;
+    }
+    
     
     void setX (int x) {
         this->x = x;
@@ -113,9 +136,8 @@ public:
     
     // Draw the circle
     void draw() {
-        ofFill();
-        ofSetHexColor(this->getColor());
-        ofDrawCircle((float)this->getX(), (float)this->getY(), (float)this->getRadius());
+        ofSetColor(*color);
+        //ofDrawCircle((float)this->getX(), (float)this->getY(), (float)this->getRadius());
     }
     
 };
